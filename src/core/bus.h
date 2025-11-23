@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include "ram.h"
-#include "rom.h"
+#include "core/ram.h"
+#include "core/rom.h"
 
 struct Bus {
   RAM ram;

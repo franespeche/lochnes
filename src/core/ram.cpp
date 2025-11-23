@@ -1,4 +1,4 @@
-#include "ram.h"
+#include "core/ram.h"
 
 RAM::RAM() {
   for (uint16_t i = 0; i < SIZE; i++) {

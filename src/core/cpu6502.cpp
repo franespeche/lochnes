@@ -1,6 +1,6 @@
-#include "cpu6502.h"
-#include "bus.h"
-#include "types.h"
+#include "core/cpu6502.h"
+#include "core/bus.h"
+#include "common/types.h"
 #include <bitset>
 #include <iostream>
 

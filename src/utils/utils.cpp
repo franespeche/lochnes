@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "utils/utils.h"
 #include <stdexcept>
 
 std::vector<uint8_t> make_rom_image(const std::vector<uint8_t> &program) {

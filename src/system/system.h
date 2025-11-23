@@ -1,9 +1,9 @@
 #pragma once
 
 #include <vector>
-#include "bus.h"
-#include "cpu6502.h"
-#include "clock.h"
+#include "core/bus.h"
+#include "core/cpu6502.h"
+#include "core/clock.h"
 
 struct System {
   Bus bus;

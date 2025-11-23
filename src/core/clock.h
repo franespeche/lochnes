@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <vector>
-#include "types.h"
+#include "common/types.h"
 
 struct Clock {
   uint64_t master_cycles = 0;

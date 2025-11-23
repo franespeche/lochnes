@@ -1,4 +1,4 @@
-#include "system.h"
+#include "system/system.h"
 
 System::System() : cpu(&bus) {
   clock.subscribe(&cpu);

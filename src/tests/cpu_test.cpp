@@ -1,5 +1,5 @@
 #include "doctest.h"
-#include "nes.h"
+#include "system/system.h"
 #include <iostream>
 
 TEST_CASE("CPU tests") {

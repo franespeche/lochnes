@@ -1,4 +1,4 @@
-#include "clock.h"
+#include "core/clock.h"
 
 void Clock::subscribe(IClockConsumer *c) {
   consumers.push_back(c);
