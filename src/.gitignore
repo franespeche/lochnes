@@ -1,0 +1,13 @@
+# Build artifacts
+*.o
+out
+*.exe
+*.dSYM
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
