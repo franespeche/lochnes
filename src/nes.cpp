@@ -1,3 +1,4 @@
+#include <bitset>
 #include <iostream>
 #include <vector>
 
@@ -30,30 +31,12 @@ struct RAM {
   }
 };
 
-// Test ROM with a simple program that loads a value into the accumulator
 struct ROM {
-  static constexpr uint16_t SIZE = 0x4000; // 16 KB PRG
-  uint8_t data[SIZE];
+  std::vector<uint8_t> data;
 
-  ROM() {
-    for (uint16_t i = 0; i < SIZE; i++) {
-      data[i] = 0;
-    }
-    data[0x0000] = 0xA9; // LDA Immediate
-    data[0x0001] = 0x80;
-    data[0x0002] = 0xA9; // LDA Immediate
-    data[0x0003] = 0x00;
-    data[0x0004] = 0xA9; // LDA Immediate
-    data[0x0005] = 0xFF;
-    data[0x0006] = 0x00; // NOP (No Operation)
+  ROM() {}
 
-    // TODO: check this!
-    // Reset vector at CPU 0xFFFC/0xFFFD → ROM offsets 0x3FFC/0x3FFD
-    constexpr uint16_t RESET_PC = 0x8000;
-
-    data[0x3FFC] = static_cast<uint8_t>(RESET_PC & 0x00FF);        // low byte
-    data[0x3FFD] = static_cast<uint8_t>((RESET_PC >> 8) & 0x00FF); // high byte
-  }
+  void load(const std::vector<uint8_t> &program) { data = program; }
 };
 
 struct Bus {
@@ -67,8 +50,13 @@ struct Bus {
     }
 
     // ROM
-    std::uint16_t offset = (address - 0x8000) % ROM::SIZE;
-    return rom.data[offset];
+    if (address >= 0x8000 && !rom.data.empty()) {
+      std::uint16_t offset = (address - 0x8000) % rom.data.size();
+      return rom.data[offset];
+    }
+
+    throw std::out_of_range("Invalid memory access at address: " +
+                            std::to_string(address));
   }
 
   void write(uint16_t address, uint8_t value) {
@@ -77,11 +65,6 @@ struct Bus {
       ram.data[address] = value;
     }
   }
-};
-
-struct Instruction {
-  uint8_t opcode;     // Opcode of the instruction
-  uint8_t cyclesLeft; // Number of cycles for the instruction
 };
 
 struct CPU6502 : IClockConsumer {
@@ -97,7 +80,10 @@ struct CPU6502 : IClockConsumer {
   CPU6502(Bus *b) : bus(b) {}
 
   void tick() {
+    std::cout << "PC: " << std::hex << static_cast<int>(PC) << "\n";
+
     uint8_t opcode = bus->read(PC);
+    std::cout << "Opcode: " << std::hex << static_cast<int>(opcode) << "\n";
     execute(opcode);
     PC++;
 
@@ -132,15 +118,6 @@ struct CPU6502 : IClockConsumer {
 
   void execute(uint8_t opcode) {
     switch (opcode) {
-    case 0xAD: {
-      uint8_t hi = read(PC++);
-      uint8_t lo = read(PC++);
-      uint16_t addr = (hi << 8) | lo;
-      A = read(addr);
-      std::cout << "LDA: A = " << static_cast<int>(A) << "\n";
-      setFlag(Z, A == 0x00);
-      setFlag(N, A & (1 << 7));
-    } break;
     case 0xA9: // LDA Immediate
       A = read(++PC);
       std::cout << "PC: " << std::hex << static_cast<int>(PC) << '\n';
@@ -173,20 +150,55 @@ private:
   std::vector<IClockConsumer *> consumers;
 };
 
-int main() {
+struct System {
   Bus bus;
-
-  CPU6502 cpu(&bus);
-  cpu.reset();
-
+  CPU6502 cpu;
   Clock clock;
-  clock.subscribe(&cpu);
 
-  for (int i = 0; i <= 10; i++) {
-    std::cout << "--------" << "tick " << i << "--------\n";
-    clock.tick();
-    std::cout << "\n";
+  System() : cpu(&bus) { clock.subscribe(&cpu); }
+
+  void test() { std::cout << "test"; }
+
+  void load_rom(const std::vector<uint8_t> &data) { bus.rom.load(data); }
+
+  void reset() { cpu.reset(); }
+
+  void run() {
+    while (true) {
+      clock.tick();
+    }
   }
+};
 
+std::vector<uint8_t> get_rom_image() {
+
+  std::vector<uint8_t> rom_image(0x8000, 0x00);
+  rom_image[0] = 0xA9;
+  rom_image[1] = 0x80;
+  rom_image[2] = 0xA9;
+  rom_image[3] = 0x00;
+  rom_image[4] = 0xA9;
+  rom_image[5] = 0xFF;
+  rom_image[6] = 0x00;
+
+  // reset vector at $FFFC/$FFFD
+  uint16_t entry = 0x8000;
+  rom_image[0x7FFC] = entry & 0xFF;        // low
+  rom_image[0x7FFD] = (entry >> 8) & 0xFF; // high
+  return rom_image;
+};
+
+int main() {
+  System system;
+
+  std::vector<uint8_t> rom_image = get_rom_image();
+  system.load_rom(rom_image);
+
+  system.reset();
+
+  // Test
+  for (int i = 0; i < 10; i++) {
+    system.clock.tick();
+  }
   return 0;
 }
