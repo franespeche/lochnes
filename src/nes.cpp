@@ -17,7 +17,7 @@ enum StatusFlag {
 
 struct IClockConsumer {
   virtual ~IClockConsumer() = default;
-  virtual void tick() = 0; // called every master tick
+  virtual void tick() = 0;
 };
 
 struct RAM {
@@ -80,6 +80,7 @@ struct CPU6502 : IClockConsumer {
   CPU6502(Bus *b) : bus(b) {}
 
   void tick() {
+    std::cout << "--------------------------------------------------\n";
     std::cout << "PC: " << std::hex << static_cast<int>(PC) << "\n";
 
     uint8_t opcode = bus->read(PC);
@@ -99,7 +100,7 @@ struct CPU6502 : IClockConsumer {
     PC = static_cast<uint16_t>(hi) << 8 | lo;
   }
 
-  // Set flag if condition is true
+  // Flags methods
   void setFlag(uint8_t f, bool cond) {
     if (cond) {
       P |= f;
@@ -157,8 +158,6 @@ struct System {
 
   System() : cpu(&bus) { clock.subscribe(&cpu); }
 
-  void test() { std::cout << "test"; }
-
   void load_rom(const std::vector<uint8_t> &data) { bus.rom.load(data); }
 
   void reset() { cpu.reset(); }
@@ -171,8 +170,8 @@ struct System {
 };
 
 std::vector<uint8_t> get_rom_image() {
-
   std::vector<uint8_t> rom_image(0x8000, 0x00);
+  // basic program
   rom_image[0] = 0xA9;
   rom_image[1] = 0x80;
   rom_image[2] = 0xA9;
@@ -185,6 +184,7 @@ std::vector<uint8_t> get_rom_image() {
   uint16_t entry = 0x8000;
   rom_image[0x7FFC] = entry & 0xFF;        // low
   rom_image[0x7FFD] = (entry >> 8) & 0xFF; // high
+
   return rom_image;
 };
 
@@ -196,9 +196,17 @@ int main() {
 
   system.reset();
 
-  // Test
-  for (int i = 0; i < 10; i++) {
-    system.clock.tick();
+  while (true) {
+    char key;
+    std::cin >> key;
+
+    switch (key) {
+    case 'n':
+      system.clock.tick();
+      break;
+    default:
+      return 0;
+    };
   }
   return 0;
 }
