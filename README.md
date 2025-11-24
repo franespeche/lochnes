@@ -7,3 +7,6 @@ All the remaining opcodes had been implemented, but not tested.
 
 Note that tests weren't tested (lol), they are just boilerplate.
 
+# Running the basic program
+To run the sample program, run `make run`.
+Since this is a hobby project, I'll be adding commits whenever I have time to do so.
