@@ -1,5 +1,5 @@
-#include "doctest.h"
-#include "system/system.h"
+#include "../doctest.h"
+#include "../system/system.h"
 #include <iostream>
 
 TEST_CASE("CPU tests") {
@@ -30,3 +30,4 @@ TEST_CASE("CPU tests") {
     CHECK(cpu->Y() == 0x13);
     */
   }
+}
