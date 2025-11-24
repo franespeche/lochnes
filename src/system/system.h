@@ -1,9 +1,9 @@
 #pragma once
 
-#include <vector>
 #include "core/bus.h"
-#include "core/cpu6502.h"
 #include "core/clock.h"
+#include "core/cpu6502.h"
+#include <vector>
 
 struct System {
   Bus bus;
@@ -13,6 +13,5 @@ struct System {
   System();
   void load_rom(const std::vector<uint8_t> &data);
   void reset();
-  void run();
+  void run(uint32_t cycles = 0);
 };
-

@@ -10,17 +10,7 @@ int main() {
 
   system.reset();
 
-  while (true) {
-    char key;
-    std::cin >> key;
+  system.run(10);
 
-    switch (key) {
-    case 'n':
-      system.clock.tick();
-      break;
-    default:
-      return 0;
-    };
-  }
   return 0;
 }

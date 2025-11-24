@@ -21,5 +21,5 @@ std::vector<uint8_t> make_rom_image(const std::vector<uint8_t> &program) {
 }
 
 // basic program
-const std::vector<uint8_t> SAMPLE_PROGRAM = {0xA9, 0x80, 0xA9, 0x00,
-                                             0xA9, 0xFF, 0x00};
+const std::vector<uint8_t> SAMPLE_PROGRAM = {0xA9, 0x88, 0xA9, 0x00,
+                                             0xA9, 0xFF, 0xEA};
